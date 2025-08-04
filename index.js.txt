@@ -1,0 +1,52 @@
+export default function Home() {
+  return (
+    <div style={{
+      fontFamily: 'Arial, sans-serif',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0F2027, #203A43, #2C5364)',
+      color: 'white',
+      padding: '20px',
+      textAlign: 'center'
+    }}>
+      <h1 style={{
+        fontSize: '3.5rem',
+        fontWeight: 'bold',
+        marginBottom: '0.5rem',
+        color: '#00B4D8'
+      }}>
+        🌊 Oceanic AI
+      </h1>
+
+      <p style={{
+        fontSize: '1.2rem',
+        maxWidth: '500px',
+        opacity: 0.85
+      }}>
+        Generate <strong>5 free AI videos daily</strong> and explore the ocean of possibilities with our powerful AI tools.
+      </p>
+
+      <button style={{
+        marginTop: '2rem',
+        backgroundColor: '#00B4D8',
+        border: 'none',
+        padding: '12px 28px',
+        fontSize: '1.1rem',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        color: 'white',
+        transition: 'all 0.3s ease'
+      }}
+        onMouseOver={(e) => e.target.style.backgroundColor = '#0096C7'}
+        onMouseOut={(e) => e.target.style.backgroundColor = '#00B4D8'}
+      >
+        🚀 Start Now
+      </button>
+    </div>
+  );
+}
+
