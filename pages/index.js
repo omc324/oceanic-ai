@@ -2,62 +2,68 @@ export default function Home() {
   return (
     <div style={{
       fontFamily: 'Arial, sans-serif',
-      backgroundColor: 'black',
+      background: 'linear-gradient(135deg, #0F2027, #203A43, #2C5364)',
       color: 'white',
       margin: 0,
-      padding: 0,
-      minHeight: '100vh'
+      padding: 0
     }}>
       
-      {/* Banner */}
-      <img 
-        src="/banner.jpg" 
-        alt="Oceanic AI Banner" 
-        style={{
-          width: '100%',
-          display: 'block',
-          boxShadow: '0 0 30px rgba(0,0,0,0.8)'
-        }}
-      />
+      {/* Full-Width Hero Banner */}
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        height: '60vh',
+        backgroundImage: 'url(/banner.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        textAlign: 'center',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+      }}>
+        <h1 style={{
+          fontSize: '3.5rem',
+          fontWeight: 'bold',
+          margin: '0',
+          color: 'white',
+          textShadow: '2px 2px 10px rgba(0,0,0,0.6)'
+        }}>
+          Welcome
+        </h1>
+        <p style={{
+          fontSize: '1.3rem',
+          maxWidth: '600px',
+          marginTop: '10px',
+          textShadow: '1px 1px 8px rgba(0,0,0,0.6)'
+        }}>
+          Generate <strong>5 free AI videos daily</strong> and explore the ocean of possibilities with our powerful AI tools.
+        </p>
+      </div>
 
-      {/* Main Content */}
+      {/* Main Content Section */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        textAlign: 'center',
-        padding: '40px 20px'
+        padding: '40px 20px',
+        textAlign: 'center'
       }}>
-        <h1 style={{
-          fontSize: '3rem',
-          fontWeight: 'bold',
-          marginBottom: '10px'
-        }}>
-        
-        </h1>
-
-        <p style={{
-          fontSize: '1.2rem',
-          maxWidth: '600px',
-          marginBottom: '30px',
-          opacity: 0.85
-        }}>
-          Generate <strong>5 free AI videos daily</strong> and explore the ocean of possibilities with our powerful AI tools.
-        </p>
-
-        {/* Start Now Button */}
-        <button style={{
-          backgroundColor: 'black',
-          color: 'white',
-          border: '2px solid white',
-          padding: '14px 40px',
-          fontSize: '1.2rem',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          boxShadow: '0 0 20px #00B4D8, 0 0 40px #ff00ff', // Blue + Pink shadow
-          transition: 'all 0.3s ease'
-        }}
+        <button
+          onClick={() => window.location.href = "/login"}
+          style={{
+            backgroundColor: 'black',
+            border: '2px solid white',
+            padding: '14px 30px',
+            fontSize: '1.2rem',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            color: 'white',
+            boxShadow: '0 0 20px #00B4D8, 0 0 40px #ff00ff',
+            transition: 'all 0.3s ease'
+          }}
           onMouseOver={(e) => {
             e.target.style.backgroundColor = '#111';
             e.target.style.boxShadow = '0 0 25px #00B4D8, 0 0 50px #ff00ff';
