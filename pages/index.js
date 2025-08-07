@@ -14,13 +14,22 @@ export default function Home() {
         textAlign: "center"
       }}
     >
-      {/* Logo */}
-      <Image
-        src="/oceanic-ai.png"
-        alt="Oceanic AI Logo"
-        width={300}
-        height={100}
-      />
+      <h1 style={{
+          fontSize: '3rem',
+          fontWeight: 'bold',
+          marginBottom: '10px'
+        }}>
+          🌊 Oceanic AI
+        </h1>
+
+        <p style={{
+          fontSize: '1.2rem',
+          maxWidth: '600px',
+          marginBottom: '30px',
+          opacity: 0.85
+        }}>
+          Generate <strong>5 free AI videos daily</strong> and explore the ocean of possibilities with our powerful AI tools.
+        </p>
 
       {/* Login Button */}
       <Link href="/login">
@@ -42,6 +51,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
