@@ -19,10 +19,10 @@ export default function Login() {
     try {
       if (isSignUp) {
         await createUserWithEmailAndPassword(auth, email, password);
-        alert("Account created successfully!");
+        alert("Account created!");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        alert("Logged in successfully!");
+        alert("Login successful!");
       }
     } catch (error) {
       alert("Error: " + error.message);
@@ -70,5 +70,7 @@ export default function Login() {
     </div>
   );
 }
+
+
 
 
