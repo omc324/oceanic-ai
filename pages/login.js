@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { auth } from "../lib/firebase";
-import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -34,24 +39,28 @@ export default function Login() {
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      backgroundColor: "black",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      color: "white",
-      fontFamily: "Arial, sans-serif"
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: "400px",
-        padding: "30px",
-        backgroundColor: "#111",
-        borderRadius: "12px",
-        textAlign: "center",
-        boxShadow: "0 0 20px #00B4D8, 0 0 40px #ff00ff" // blue + pink glow
-      }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#000",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "400px",
+          padding: "30px",
+          backgroundColor: "#111",
+          borderRadius: "12px",
+          textAlign: "center",
+          boxShadow: "0 0 20px #00B4D8, 0 0 40px #ff00ff",
+        }}
+      >
         <h1 style={{ marginBottom: "20px" }}>
           {isSignUp ? "Sign Up" : "Login"} to Oceanic AI
         </h1>
@@ -67,8 +76,8 @@ export default function Login() {
             marginBottom: "10px",
             borderRadius: "6px",
             border: "1px solid white",
-            backgroundColor: "black",
-            color: "white"
+            backgroundColor: "#000",
+            color: "white",
           }}
         />
 
@@ -83,30 +92,32 @@ export default function Login() {
             marginBottom: "20px",
             borderRadius: "6px",
             border: "1px solid white",
-            backgroundColor: "black",
-            color: "white"
+            backgroundColor: "#000",
+            color: "white",
           }}
         />
 
         <button
+          type="button"
           onClick={handleEmailAuth}
           style={{
             width: "100%",
             padding: "12px",
             marginBottom: "15px",
-            backgroundColor: "black",
+            backgroundColor: "#000",
             color: "white",
             fontWeight: "bold",
             borderRadius: "8px",
             cursor: "pointer",
             border: "2px solid white",
-            boxShadow: "0 0 10px #00B4D8, 0 0 20px #ff00ff"
+            boxShadow: "0 0 10px #00B4D8, 0 0 20px #ff00ff",
           }}
         >
           {isSignUp ? "Sign Up" : "Login"}
         </button>
 
         <button
+          type="button"
           onClick={handleGoogleLogin}
           style={{
             width: "100%",
@@ -117,7 +128,7 @@ export default function Login() {
             borderRadius: "8px",
             cursor: "pointer",
             border: "2px solid white",
-            boxShadow: "0 0 10px #00B4D8, 0 0 20px #ff00ff"
+            boxShadow: "0 0 10px #00B4D8, 0 0 20px #ff00ff",
           }}
         >
           Sign in with Google
