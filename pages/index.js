@@ -11,11 +11,11 @@ export default function Home() {
       paddingBottom: "50px",
       textAlign: "center"
     }}>
-      {/* Logo */}
+      {/* Updated Logo Image */}
       <img
-        src="/logo.png"
+        src="/oceanic-ai.png"
         alt="Oceanic AI"
-        style={{ maxWidth: "320px", marginBottom: "20px" }}
+        style={{ maxWidth: "300px", marginBottom: "30px" }}
       />
 
       {/* Login Button */}
@@ -36,5 +36,7 @@ export default function Home() {
     </div>
   );
 }
+
+
 
 
