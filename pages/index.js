@@ -11,12 +11,14 @@ export default function Home() {
       paddingBottom: "50px",
       textAlign: "center"
     }}>
-      {/* Updated Logo Image */}
-      <img
-        src="/oceanic-ai.png"
-        alt="Oceanic AI"
-        style={{ maxWidth: "300px", marginBottom: "30px" }}
-      />
+      import Image from "next/image";
+
+<Image 
+  src="/oceanic-ai.png" 
+  alt="Oceanic AI Logo" 
+  width={300} 
+  height={100}
+/>
 
       {/* Login Button */}
       <Link href="/login">
@@ -36,6 +38,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
