@@ -1,0 +1,13 @@
+/* styles/globals.css */
+body {
+  background-image: url('/background.jpg'); /* Use the correct image file name */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: white;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+
