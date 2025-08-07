@@ -1,17 +1,17 @@
-export default function MyApp({ Component, pageProps }) {
-  return (
-    <div style={{
-      backgroundImage: "url('/bg.jpg')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundAttachment: "fixed",
-      minHeight: "100vh",
-      color: "white"
-    }}>
-      <Component {...pageProps} />
-    </div>
-  );
+import '../styles/globals.css';
+/* In globals.css */
+body {
+  background-image: url('/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: white;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
+
+
 
 
 
