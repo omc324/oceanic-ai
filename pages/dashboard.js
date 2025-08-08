@@ -1,9 +1,22 @@
 // pages/dashboard.js
 import { useEffect, useState } from "react";
-import { auth, db, storage } from "../lib/firebase";
-import { doc, getDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/router";
+import { auth, db, storage } from "../lib/firebase";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  increment,
+  collection,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  serverTimestamp
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { signOut } from "firebase/auth";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -13,56 +26,74 @@ export default function Dashboard() {
   const [videos, setVideos] = useState([]);
   const [quota, setQuota] = useState(0);
 
+  // Auth protection + initial data fetch
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged(u => {
-      if (!u) return router.push("/login");
+    const unsubAuth = auth.onAuthStateChanged(async (u) => {
+      if (!u) {
+        router.push("/login");
+        return;
+      }
       setUser(u);
-      // read videosToday
-      (async () => {
-        const docRef = doc(db, "users", u.uid);
-        const snap = await getDoc(docRef);
-        setQuota(snap.exists() ? (snap.data().videosToday || 0) : 0);
-      })();
 
-      // subscribe to user's videos
-      const q = query(collection(db, "videos"), where("uid", "==", u.uid), orderBy("createdAt", "desc"));
-      const unsubscribe = onSnapshot(q, snap => {
-        setVideos(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      // Fetch today's quota
+      const docRef = doc(db, "users", u.uid);
+      const snap = await getDoc(docRef);
+      setQuota(snap.exists() ? snap.data().videosToday || 0 : 0);
+
+      // Listen for videos
+      const q = query(
+        collection(db, "videos"),
+        where("uid", "==", u.uid),
+        orderBy("createdAt", "desc")
+      );
+      const unsubVideos = onSnapshot(q, (snap) => {
+        setVideos(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
       });
-      return () => unsubscribe();
+
+      return () => unsubVideos();
     });
-    return () => unsub();
-  }, []);
+
+    return () => unsubAuth();
+  }, [router]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/login");
+  };
 
   const generateVideo = async () => {
     if (!user) return router.push("/login");
-    // Quota check (5 per day)
-    if (quota >= 5) { alert("Daily limit reached (5)."); return; }
+    if (quota >= 5) {
+      alert("Daily limit reached (5).");
+      return;
+    }
 
     setLoading(true);
     try {
-      // Call serverless to generate binary
-      const r = await fetch("/api/generate", {
+      // Call API to generate video
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt })
       });
-      if (!r.ok) {
-        const err = await r.json().catch(()=>({error:r.statusText}));
-        throw new Error(err.error || r.statusText);
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: res.statusText }));
+        throw new Error(err.error || res.statusText);
       }
 
-      // receive blob
-      const blob = await r.blob();
+      const blob = await res.blob();
 
-      // upload to Firebase Storage
+      // Upload to Firebase Storage
       const filename = `${user.uid}/${Date.now()}.mp4`;
       const storageRef = ref(storage, filename);
       await uploadBytes(storageRef, blob);
       const url = await getDownloadURL(storageRef);
 
-      // increment quota & create video record
-      await updateDoc(doc(db, "users", user.uid), { videosToday: increment(1) });
+      // Update quota + save video metadata
+      await updateDoc(doc(db, "users", user.uid), {
+        videosToday: increment(1)
+      });
       await addDoc(collection(db, "videos"), {
         uid: user.uid,
         url,
@@ -76,39 +107,62 @@ export default function Dashboard() {
       alert("Error: " + (err.message || err));
     } finally {
       setLoading(false);
-      // refresh quota
       const snap = await getDoc(doc(db, "users", user.uid));
-      setQuota(snap.exists() ? (snap.data().videosToday || 0) : 0);
+      setQuota(snap.exists() ? snap.data().videosToday || 0 : 0);
     }
   };
 
+  if (!user) {
+    return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading...</p>;
+  }
+
   return (
-    <div style={{ minHeight: "100vh", padding: 24, color: "white" }}>
-      <h1>Dashboard</h1>
+    <div style={{ minHeight: "100vh", padding: 24 }}>
+      <h1>Welcome, {user.email}</h1>
+      <button onClick={handleLogout} style={{ marginBottom: 20 }}>
+        Logout
+      </button>
       <p>Videos today: {quota}/5</p>
 
-      <div>
-        <textarea value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="Describe the video (e.g. 'A cat running')" rows={3} style={{ width:"100%" }}/>
-        <button onClick={generateVideo} disabled={loading} style={{ marginTop:12 }}>
-          {loading ? "Generating..." : "Generate Video"}
-        </button>
-      </div>
+      <textarea
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Describe the video (e.g. 'A cat running')"
+        rows={3}
+        style={{ width: "100%", marginTop: 12 }}
+      />
+      <button
+        onClick={generateVideo}
+        disabled={loading}
+        style={{ marginTop: 12 }}
+      >
+        {loading ? "Generating..." : "Generate Video"}
+      </button>
 
       <hr style={{ margin: "24px 0" }} />
       <h2>Your videos</h2>
-      <div>
-        {videos.length === 0 && <p>No videos yet.</p>}
-        {videos.map(v => (
-          <div key={v.id} style={{ marginBottom: 12, background: "#111", padding: 12, borderRadius: 8 }}>
-            <video src={v.url} controls style={{ maxWidth: "100%" }} />
-            <div style={{ marginTop:8 }}>
-              <a href={v.url} target="_blank" rel="noreferrer">Download</a>
-              <div style={{ fontSize:12, color:"#bbb" }}>{v.prompt}</div>
-            </div>
+      {videos.length === 0 && <p>No videos yet.</p>}
+      {videos.map((v) => (
+        <div
+          key={v.id}
+          style={{
+            marginBottom: 12,
+            background: "#f0f0f0",
+            padding: 12,
+            borderRadius: 8
+          }}
+        >
+          <video src={v.url} controls style={{ maxWidth: "100%" }} />
+          <div style={{ marginTop: 8 }}>
+            <a href={v.url} target="_blank" rel="noreferrer">
+              Download
+            </a>
+            <div style={{ fontSize: 12, color: "#555" }}>{v.prompt}</div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }
+
 
