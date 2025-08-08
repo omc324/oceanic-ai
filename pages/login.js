@@ -1,40 +1,40 @@
-import { useState } from "react";
+// pages/login.js
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { auth, db } from "../lib/firebase";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
 } from "firebase/auth";
 import {
   doc,
   setDoc,
   getDoc,
-  updateDoc,
-  increment
+  updateDoc
 } from "firebase/firestore";
 
-export default function Login() {
+export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
 
-  const handleAuth = async () => {
+  // Redirect if already logged in
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) router.push("/dashboard");
+    });
+    return () => unsubscribe();
+  }, [router]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
     try {
-      if (isSignUp) {
-        // Sign up
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        // Create Firestore doc
-        await setDoc(doc(db, "users", user.uid), {
-          videosToday: 0,
-          lastLogin: new Date().toISOString()
-        });
-
-        alert("Account created successfully!");
-        window.location.href = "/dashboard";
-
-      } else {
-        // Login
+      if (isLogin) {
+        // LOGIN
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
@@ -60,57 +60,76 @@ export default function Login() {
             return;
           }
         } else {
-          // If doc doesn't exist, create one
+          // If no record, create one
           await setDoc(userRef, {
             videosToday: 0,
             lastLogin: new Date().toISOString()
           });
         }
 
-        alert("Logged in successfully!");
-        window.location.href = "/dashboard";
+      } else {
+        // SIGN UP
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Create Firestore doc
+        await setDoc(doc(db, "users", user.uid), {
+          videosToday: 0,
+          lastLogin: new Date().toISOString()
+        });
       }
-    } catch (error) {
-      alert(error.message);
+
+      router.push("/dashboard");
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100vh",
-      background: "#f4f4f4"
-    }}>
-      <h1>{isSignUp ? "Sign Up" : "Login"}</h1>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{ margin: "8px", padding: "10px" }}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ margin: "8px", padding: "10px" }}
-      />
-      <button onClick={handleAuth} style={{ margin: "8px", padding: "10px 20px" }}>
-        {isSignUp ? "Sign Up" : "Login"}
-      </button>
-      <p
-        style={{ color: "blue", cursor: "pointer" }}
-        onClick={() => setIsSignUp(!isSignUp)}
-      >
-        {isSignUp ? "Already have an account? Login" : "Don't have an account? Sign Up"}
+    <div style={{ textAlign: "center", padding: "50px" }}>
+      <h1>{isLogin ? "Login" : "Sign Up"}</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{ padding: "10px", margin: "5px" }}
+        />
+        <br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          style={{ padding: "10px", margin: "5px" }}
+        />
+        <br />
+        <button type="submit" style={{ padding: "10px", marginTop: "10px" }}>
+          {isLogin ? "Login" : "Sign Up"}
+        </button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <p>
+        {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+        <button
+          onClick={() => setIsLogin(!isLogin)}
+          style={{
+            color: "blue",
+            background: "none",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          {isLogin ? "Sign Up" : "Login"}
+        </button>
       </p>
     </div>
   );
 }
+
 
 
 
