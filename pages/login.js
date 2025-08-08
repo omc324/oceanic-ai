@@ -1,10 +1,10 @@
-// pages/login.js
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { auth, db } from "../lib/firebase";
 import {
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  onAuthStateChanged
 } from "firebase/auth";
 import {
   doc,
@@ -20,9 +20,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(true);
 
-  // Redirect if already logged in
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) router.push("/dashboard");
     });
     return () => unsubscribe();
@@ -31,6 +30,8 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    console.log("Trying:", email, password); // debug
 
     try {
       if (isLogin) {
@@ -46,7 +47,6 @@ export default function LoginPage() {
           const today = new Date().toISOString().split("T")[0];
           const lastLoginDate = data.lastLogin ? data.lastLogin.split("T")[0] : null;
 
-          // Reset counter if new day
           if (lastLoginDate !== today) {
             await updateDoc(userRef, {
               videosToday: 0,
@@ -54,13 +54,11 @@ export default function LoginPage() {
             });
           }
 
-          // Check free limit
           if (data.videosToday >= 5 && lastLoginDate === today) {
             alert("You have reached your free video limit for today.");
             return;
           }
         } else {
-          // If no record, create one
           await setDoc(userRef, {
             videosToday: 0,
             lastLogin: new Date().toISOString()
@@ -72,7 +70,6 @@ export default function LoginPage() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Create Firestore doc
         await setDoc(doc(db, "users", user.uid), {
           videosToday: 0,
           lastLogin: new Date().toISOString()
@@ -81,6 +78,7 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch (err) {
+      console.error(err);
       setError(err.message);
     }
   };
@@ -129,6 +127,8 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
 
 
 
